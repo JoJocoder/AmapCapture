@@ -13,7 +13,6 @@
 <link rel="stylesheet" href="bootstrap.min.css">
 	<script src="bootstrap.min.js"></script>
   <script type="text/javascript" src="html2canvas.min.js"></script>
-   <script src="keymage.min.js"></script>
 <script src="http://webapi.amap.com/maps?v=1.4.2&key=48f0eb4e1db28f2b96da21636751cdba&plugin=AMap.Scale,AMap.MouseTool,AMap.Driving,AMap.ArrivalRange,AMap.Autocomplete,AMap.PlaceSearch,AMap.DistrictSearch,AMap.Geocoder"></script>
   <script src="es5.min.js"></script>
   <script src="jquery.range.js"></script>
@@ -309,38 +308,6 @@ $('#captureSub').click();
 
 })
 
-//快捷键 增加节点
-keymage("shift-a",function() {
-$('#addNode').click();
-})
-//快捷键 管道绘制
-keymage("shift-x",function() {
-$('#drawLine').click();
-})
-//快捷键 子流域绘制
-keymage("shift-z",function() {
-$('#drawSub').click();
-})
-//快捷键 ID显示
-keymage("shift-s",function() {
-$('#showID').click();
-})
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 //清除标记 
  AMap.event.addListener(map, "rightclick", function()
  {
@@ -510,68 +477,20 @@ $("#tools").append("<input type='button' class='rightbutton' value='选取范围
 	var lnglatpointsl=[]//左上角
 	var lnglatpointsr=[]//右下角
 	var nowmap=map;
-	
-	/*
-	var moveend = map.on('moveend', function(e) {
-	//if(){
-	//alert('ddd');
-	var l=map.containTolnglat(new AMap.Pixel(450, 150));
-	var r=map.containTolnglat(new AMap.Pixel(962, 662));
-	lnglatpointsl.push([l.getLng(),l.getLat()]);
-	lnglatpointsr.push([r.getLng(),r.getLat()]);
-	  // }
-	   }
-	)
-		var moveend = normalMaptu1.on('moveend', function(e) {
-	//if(){
-	//alert('ddd');
-	var l=normalMaptu1.containTolnglat(new AMap.Pixel(450, 150));
-	var r=normalMaptu1.containTolnglat(new AMap.Pixel(962, 662));
-	lnglatpointsl.push([l.getLng(),l.getLat()]);
-	lnglatpointsr.push([r.getLng(),r.getLat()]);
-	  // }
-	   }
-	)
-			var moveend = normalMaptu2.on('moveend', function(e) {
-	//if(){
-	//alert('ddd');
-	var l=normalMaptu2.containTolnglat(new AMap.Pixel(450, 150));
-	var r=normalMaptu2.containTolnglat(new AMap.Pixel(962, 662));
-	lnglatpointsl.push([l.getLng(),l.getLat()]);
-	lnglatpointsr.push([r.getLng(),r.getLat()]);
-	  // }
-	   }
-	)
-	*/
 	function addLngLat() {
 	
-	//var moveend = nowmap.on('moveend', function(e) {
-	//if(){
-	//alert('ddd');
+
 	var l=nowmap.containTolnglat(new AMap.Pixel(450, 80));
 	var l1=nowmap.containTolnglat(new AMap.Pixel(962, 80));
 	var r=nowmap.containTolnglat(new AMap.Pixel(450, 592));
 	var r1=nowmap.containTolnglat(new AMap.Pixel(962, 592));
-	<!-- var markerzb= new AMap.Marker({ //添加自定义点标记 -->
-        <!-- map: map, -->
-        <!-- position:[l.getLng(),l.getLat()] , //基点位置 -->
-        <!-- draggable: false //是否可拖动  -->
-
-<!-- });  -->
-<!-- var markerzb= new AMap.Marker({ //添加自定义点标记 -->
-        <!-- map: map, -->
-        <!-- position:[r.getLng(),r.getLat()] , //基点位置 -->
-        <!-- draggable: false //是否可拖动  -->
-        
-<!-- });  -->
+	
 	lnglatpointsl.push([l.getLng(),l.getLat()]);
 	lnglatpointsl.push([l1.getLng(),l1.getLat()]);
 	lnglatpointsl.push([r.getLng(),r.getLat()]);
 	lnglatpointsl.push([r1.getLng(),r1.getLat()]);
-	  // }
 	   }
-	//)
-	//}
+
 	var minll;var maxll;
 	  function maxmin()
 	  {
