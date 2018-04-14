@@ -164,19 +164,3 @@ while True:
 
 end=time.time()
 print('程序用时：' + str(end - start) + '秒')
-# if __name__ == "__main__":
-	# findStartPoint([118,2;])
-# browser.find_element_by_id("captureMap").click()
-# alert = browser.switch_to.alert
-# alert.accept()
-# try:
-    # WebDriverWait(browser, 20, 0.5).until(EC.alert_is_present())
-    # r = browser.execute_script("return rectangle")
-    # print (r)
-# finally:
-    # print("No area")
-
-# captureMap=browser.find_elements_by_id('captureMap')
-# print(captureMap)
-# browser.save_screenshot("codingpy.png")
-# browser.close()
