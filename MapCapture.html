@@ -1,0 +1,854 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+  <title> GISWMM地图 </title>
+  <meta charset="utf-8">
+  <meta name="generator" content="editplus" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="author" content="" />
+  <meta name="keywords" content="" />
+  <meta name="description" content="" />
+  <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+  <script type="text/javascript" src="jquery.min.js"></script>
+<link rel="stylesheet" href="bootstrap.min.css">
+	<script src="bootstrap.min.js"></script>
+  <script type="text/javascript" src="html2canvas.min.js"></script>
+   <script src="keymage.min.js"></script>
+<script src="http://webapi.amap.com/maps?v=1.4.2&key=48f0eb4e1db28f2b96da21636751cdba&plugin=AMap.Scale,AMap.MouseTool,AMap.Driving,AMap.ArrivalRange,AMap.Autocomplete,AMap.PlaceSearch,AMap.DistrictSearch,AMap.Geocoder"></script>
+  <script src="es5.min.js"></script>
+  <script src="jquery.range.js"></script>
+
+  <link rel="stylesheet" href="http://cache.amap.com/lbs/static/jquery.range.css"/>
+
+  <style type="text/css">
+  html, body {
+	margin: 0;
+	height: 100%;
+	width: 100%;
+	position: absolute;
+	font-family:"微软雅黑",Arial,Helvetica,sans-serif;
+	}
+    #setmap{height:20px;position: absolute;bottom:10px;text-align:right;right:10px;}
+	#swmm{height:20px;position: absolute;top:10px;text-align:right;right:10px;}
+    #tools{height:20px;position: absolute;top:10px;left:10px;}
+	#mapcontainer{height:100%;width:100%;position:absolute;top:0;left:0;right:0;bottom:0;}
+	.button {
+	margin-right:0px;
+	background-color: #FFFFFF;
+	color: #5F6477;
+	border: 1;
+	outdrawLine: none;
+	border-radius: 0px;
+	cursor: pointer;
+	box-shadow:2px 2px 2px #000;
+	width:60px; 
+	height:30px;
+	font-size: 10px;
+	border-style: none dashed none dashed;
+	border-width: 1px;
+	}
+.rightbutton
+{
+margin-right:0px;
+	background-color: #FFFFFF;
+	color: #5F6477;
+	border: 1;
+	outdrawLine: none;
+	border-radius: 0px;
+	cursor: pointer;
+	box-shadow:2px 2px 2px #000;
+	width:80px; 
+	height:30px;
+	font-size: 10px;
+	border-style: none dashed none dashed;
+	border-width: 1px;
+	}
+	.rightbutton:hover {background-color: #E6E6E6;}
+	
+	.button:hover {background-color: #E6E6E6;}
+	.button:active{
+    position:relative;
+    top:1px; 
+}
+	.rightbutton:active{
+    position:relative;
+    top:1px; 
+}
+.bottombutton
+{
+    margin-right:0px;
+	background-color: #FFFFFF;
+	color: #5F6477;
+	border: 1;
+	outdrawLine: none;
+	border-radius: 0px;
+	cursor: pointer;
+	box-shadow:2px 2px 2px #000;
+	width:60px; 
+	height:30px;
+	font-size: 10px;
+	border-style: none dashed none dashed;
+	border-width: 1px;
+	}
+	.bottombutton:hover {background-color: #E6E6E6;}
+
+	.button:active{
+    position:relative;
+    top:1px; 
+}
+
+    #tipgongjiao,#boundarypool{
+	background-color: #fff;
+	padding-left: 10px;
+	padding-right: 10px;
+	position: absolute;
+	font-size: 13px;
+	right: 190px;
+	bottom:32px;;
+	border-radius: 3px;
+	border: 1px solid #FFFFFF;
+	drawLine-height: 30px;
+	display:none;
+    }
+	#LngLatpool{
+	background-color: #fff;
+	padding-left: 10px;
+	padding-right: 10px;
+	position: absolute;
+	font-size: 14px;
+	left: 150px;
+	top:40px;;
+	border-radius: 3px;
+	border: 1px solid #FFFFFF;
+	drawLine-height: 30px;
+	display:none;
+    }
+    #tipgongjiao input{width: 80px;height:20px;}
+	.amap-marker-label{background:#FFC125;border:0;font-size:15px;color:#000;}
+	.zhu{
+	color:#000;
+	-webkit-text-stroke-width:1px;
+	-webkit-text-stroke-color:#F33;
+	}
+	.input-group{width:300px;height:30px;border-radius:0px}
+	.input-group-addon{width:160px;height:30px;border-radius:0px}
+	.form-control{border-radius:0px;font-size:8px}
+	.modal-dialog{width:342px;height:100px}
+	.controls {
+    position: absolute;
+    right: 35px;
+}
+	.control-label {
+    position: absolute;
+    left: 35px;
+}
+	
+  </style>
+ </head>
+ <body>
+  <div id="mapcontainer"></div>
+  <div id="setmap"></div>
+  <div id="tools"></div>
+   <div id="swmm"></div>
+<div id="tipgongjiao" class="button-group">
+    所点击位置 
+    X:<input type="text" name="x" id='lngX' value="116.39742"/>
+    Y:<input type="text" name="y" id='latY' value="39.909325"/>
+    <br>
+    时间：
+    <input type="hidden" id="t" class="single-slider" value="30" />
+    <br>
+    交通类型:
+    <select name="v" id="v">
+        <option value ="BUS,SUBWAY">地铁+公交</option>
+        <option value ="SUBWAY">地铁</option>
+        <option value ="BUS">公交</option>
+    </select>
+    <input type="button" class="button" value="生活圈" onClick="javascript:adddrawSub()"/>
+    <input type="button" class="button" value="清空" onClick="javascript:deldrawSub()"/>
+</div>
+<div id="boundarypool">
+<input name="city" type="checkbox" value="南京市" />南京
+<input name="city" type="checkbox" value="上海市" />上海
+<input name="city" type="checkbox" value="合肥市" />合肥
+<input name="city" type="checkbox" value="句容市" />句容<br />
+<input name="city" type="checkbox" value="滁州市" />滁州
+<input name="city" type="checkbox" value="徐州市" />徐州
+<input type='button' value='OK' id='boundaryok'/>
+</div>
+<div id="LngLatpool">
+<input name="coordinate" type="checkbox" value="baidu" />百度
+<input name="coordinate" type="checkbox" value="gaode" />高德
+<input type='button' value='OK' id='zuobiaook'/>
+</div>
+
+ </body>
+   <script>
+   //变量
+   var drawLineArr=new Array();var canvas2 = document.createElement("canvas");
+   var uri = 'data:application/vnd.ms-excel;base64,';
+   var allSub='';var areArr=new Array();var pixelArr=new Array();var pipeArr=new Array();var subArr=new Array();var nodesArr=new Array();
+   var allPipe='';	var allNode='';var ID=1;var IDlabel=new Array();var thisclick=null;
+		var markers=[],polylines=[],polygons=[],boundarys=[];
+   //--------------------------------------------------------------------------------------
+    var map = new AMap.Map('mapcontainer', {
+        resizeEnable: true,
+        zoom:11,
+		features : ['bg', 'point'],
+		 layers: [new AMap.TileLayer.Satellite()],
+		 zoom:14,
+		 center:[118.79484,32.054227],
+		labelzIndex:1
+    });
+	window.map = map;
+	//在地图中添加MouseTool插件
+    var mouseTool = new AMap.MouseTool(map);
+var normalMap;
+    //搜索输入提示
+	$("#tools").append("<input id='tipinput' placeholder='搜索' style=\"font-size: 10px;height:29px;width:130px;box-shadow:2px 2px 2px #000;\"/>  "); 
+	var autoOptions = new AMap.Autocomplete({
+        input: "tipinput"
+    });
+    //选择提示自动搜索
+	var auto = new AMap.Autocomplete(autoOptions);
+    var placeSearch = new AMap.PlaceSearch({ map: map }); 
+    AMap.event.addListener(auto, "select", select);//注册监听，当选中某条记录时会触发
+    function select(e) {
+        
+		placeSearch.setCity(e.poi.adcode);
+        placeSearch.search(e.poi.name);  //关键字查询
+    }
+
+    //回车搜索
+	$(function(){ 
+     $("#tipinput").keydown(function(e) {  
+          if (e.keyCode == '13') {  
+            placeSearch.search($("#tipinput").val());  //关键字查询 
+          }  
+     }); 
+	});
+	 $("#tools").append("<input type='button' class='button' value='坐标搜索' id='searchByLngLat'/>");
+    AMap.event.addDomListener($('#searchByLngLat').get(0), 'click', function() {
+		if($("#searchByLngLat").val() == "坐标搜索"){
+	       $("#searchByLngLat").val("地址搜索");
+
+		if($("#LngLatpool").is(":hidden")){
+	       $('#LngLatpool').show();
+		}else{
+		   $('#LngLatpool').hide();
+		}
+		}
+		else{
+		   $("#searchByLngLat").val("坐标搜索");
+		   <!-- if($("#LngLatpool").is(":hidden")){ -->
+	       <!-- $('#LngLatpool').show(); -->
+		<!-- }else{ -->
+		   <!-- $('#LngLatpool').hide(); -->
+		<!-- } -->
+		}
+    }, false);
+		//搜索按钮
+	 $("#tools").append("<input type='button' class='button' value='搜索' id='search'/>");
+	 AMap.event.addDomListener($('#search').get(0), 'click', function() {
+	 if($("#searchByLngLat").val() == "地址搜索")
+	 {
+	  placeSearch.search($("#tipinput").val());
+	 }
+    else
+	{
+    var zb=$("#tipinput").val();
+	lnglat = zb.split(",");
+	lng = Number(lnglat[0]);
+	lat = Number(lnglat[1]);
+	if($('input[value="baidu"]:checked'))
+	{
+	zb=bd09togcj02(lng,lat);
+	lnglat = zb;
+	}
+	else{lnglat = new AMap.LngLat(lng, lat);}
+	var markerzb= new AMap.Marker({ //添加自定义点标记
+        map: map,
+        position:lnglat , //基点位置
+        draggable: false //是否可拖动 
+
+}); 
+	map.setFitView();
+	}
+    }, false);
+	
+    $("#tools").append("<input type='button' class='button' value='查坐标' id='getLngLat'/>");
+	var _onclick=function(e) {
+        alert('百度坐标系： '+gcj02tobd09(e.lnglat.getLng(),e.lnglat.getLat())+'                                                     高德坐标系： '+e.lnglat.getLng() + ',' + e.lnglat.getLat());
+       };
+    AMap.event.addDomListener($('#getLngLat').get(0), 'click', function() {
+		if($("#getLngLat").val() == "查坐标"){
+	       $("#getLngLat").val("取消");
+		   mouseTool.close();//取消鼠标的其他操作绑定
+           map.on('click',_onclick);
+		}else{
+		   $("#getLngLat").val("查坐标");
+           map.off('click',_onclick);
+		}
+    }, false);
+
+    //显示比例尺
+    map.addControl(new AMap.Scale());
+
+	//右下角添加当前地图缩放级别
+	$("#setmap").prepend("<span id='info'></span>"); 
+	$("#info").html(map.getZoom());
+	AMap.event.addListener(map,'zoomend',function(){
+        $("#info").html(map.getZoom());
+    });
+var deleteID=null;
+
+//快捷键 截图
+keymage("shift-c",function() {
+
+$('#captureSub').click();
+
+})
+
+//快捷键 增加节点
+keymage("shift-a",function() {
+$('#addNode').click();
+})
+//快捷键 管道绘制
+keymage("shift-x",function() {
+$('#drawLine').click();
+})
+//快捷键 子流域绘制
+keymage("shift-z",function() {
+$('#drawSub').click();
+})
+//快捷键 ID显示
+keymage("shift-s",function() {
+$('#showID').click();
+})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//清除标记 
+ AMap.event.addListener(map, "rightclick", function()
+ {
+ var alloverlaysList = map.getAllOverlays();
+ $.each(alloverlaysList, function (k) {
+     alloverlaysList[k].on('rightclick', function (e) 
+	{	
+	thisclick=alloverlaysList[k];var deleteID=thisclick.getExtData();
+	var contextMenu = new AMap.ContextMenu();  //创建右键菜单
+    //清除覆盖物
+	if(alloverlaysList[k].CLASS_NAME=='AMap.Polygon')
+	{
+    contextMenu.addItem("清除标记", function() {
+     
+	 
+	 
+	 delete subArr['Subcatchment{0}'.Format({0:deleteID})];
+	 
+	
+	 thisclick.setMap(null);
+    }, 0);
+    //右键清除所有标记
+    contextMenu.addItem("清除所有标记", function() {
+        map.clearMap();
+		subArr=[];
+		pipeArr=[];
+		nodesArr=[];
+    }, 1);
+	//编辑覆盖物
+	contextMenu.addItem("边界编辑", function() {
+	drawLineArr=[];areArr=[];
+     map.plugin(["AMap.PolyEditor"],function(){
+        polylineEditor = new AMap.PolyEditor(map,alloverlaysList[k]); 
+        polylineEditor.open(); 
+    });                 
+	}, 2);
+		//完成编辑
+	contextMenu.addItem("完成编辑", function() {          
+	 polylineEditor.on('end',function(e){ 
+	 drawLineArr.push(e.target.getPath());
+	 areArr.push(e.target.getArea( ))
+	 })
+	 polylineEditor.close();
+	}, 3);
+	contextMenu.addItem("属性", function() { 
+	$('#SubModal').modal('show');
+	 $('#subName').val(thisclick.getExtData()['ID']);
+	 
+	 
+
+	}, 4);
+	contextMenu.open(map, e.lnglat);
+    contextMenuPositon =  e.lnglat;
+	}
+	else{
+	
+	
+	var deleteID=thisclick.getExtData();
+		var contextMenu = new AMap.ContextMenu();  //创建右键菜单
+    //清除覆盖物
+    contextMenu.addItem("清除标记", function() { 
+	if(thisclick.CLASS_NAME=='AMap.Polyline')
+	 {delete pipeArr['Pipe{0}'.Format({0:deleteID})]
+	 }
+	 if(thisclick.CLASS_NAME=='AMap.Marker')
+	 {delete nodesArr['Node{0}'.Format({0:deleteID})]
+	 }
+     thisclick.setMap(null);
+    }, 0);
+    //右键清除所有标记
+    contextMenu.addItem("清除所有标记", function() {
+        map.clearMap();
+		subArr=[];
+		pipeArr=[];
+		nodesArr=[];
+    }, 1);
+	contextMenu.addItem("属性", function() { 
+	if(alloverlaysList[k].CLASS_NAME=='AMap.Marker')
+	{$('#nodeModal').modal('show');
+	 $('#nodeNames').val(thisclick.getExtData()['ID']);
+	 }
+	
+	 if(alloverlaysList[k].CLASS_NAME=='AMap.Polyline')
+	{
+	$('#lineModal').modal('show');
+	 $('#lineName').val(thisclick.getExtData()['ID']);
+	 }
+
+	}, 3);
+	contextMenu.open(map, e.lnglat);
+    contextMenuPositon =  e.lnglat;
+	}
+	
+	});
+});
+ });
+ var SubArray=[];
+ //属性updata
+function updateSub() {  
+SubArray['SubName']=$('#subName').val;
+SubArray['SubArea']=$('#subArea').val;
+
+<!-- for(var j = 0;j<SubArray.length;j++){ -->
+<!-- 　　if($.inArray(SubArray[j].value, mySub) < 0){//使用jquery进行判断该数组是否包含该值 -->
+    <!-- 　　mySub.push({   //类似于JS添加JSON的字典方法，Key对应键值，value对应值 -->
+      <!-- 　　'key': SubArray[j].Type.value, -->
+     <!-- 　　'value': SubArray[j].Type.displayName, -->
+     <!-- 　　}); -->
+<!-- 　　} -->
+<!-- } -->
+
+for(var key in SubArray)
+{
+if($.inArray(SubArray[key], mySub) < 0){//使用jquery进行判断该数组是否包含该值
+    　　mySub.push({   //类似于JS添加JSON的字典方法，Key对应键值，value对应值
+      　　'key': key,
+     　　'value':SubArray[key],
+     　　});
+}
+}
+thisclick.setExtData(mySub);
+}
+ 
+
+ 
+	
+var startpoint=[];
+var endpoint=[];
+var rectangle=[];
+var countH=0;
+var countW=0;
+var startpointPixel=[];
+var endpointPixel=[];
+$("#tools").append("<input type='button' class='rightbutton' value='选取范围' id='captureMap'/>");
+    AMap.event.addDomListener($('#captureMap').get(0), 'click', function() { 
+	
+	if($("#captureMap").val() == "选取范围")
+	{	map.setDefaultCursor("crosshair");
+		$("#captureMap").val("确定下载");
+       mouseTool.polygon({fillColor:'#8000000F',fillOpacity:0,bubble:true,strokeColor:'#00FFFF'})
+    }
+
+	else
+	{
+	  $("#captureMap").val("选取范围"); 
+	  //addLngLat();
+		 //rectangle=map.getAllOverlays();
+		 rectangle=map.getAllOverlays();
+		 var startLng=[];
+		var startLat=[];
+		 var endLng=[];
+		var endLat=[];
+		 for(var i=0;i<rectangle[0].getPath().length;i++){
+		 startLng.push(rectangle[0].getPath()[i]['L']);
+		 startLat.push(rectangle[0].getPath()[i]['N']);
+		 } 
+		 startpoint=[startLng.sort()[0],startLat.sort()[startLat.length-1]];
+		 endpoint=[startLng.sort()[startLat.length-1],startLat.sort()[0]];
+		 startpointPixel=map.lnglatToPixel([startLng.sort()[0],startLat.sort()[startLat.length-1]], 10);
+		 endpointPixel=map.lnglatToPixel([startLng.sort()[startLat.length-1],startLat.sort()[0]], 10);
+		 countH=(endpointPixel['y']-startpointPixel['y']);
+		 countW=(endpointPixel['x']-startpointPixel['x']);
+    }
+	map.clearMap();
+    }, false);	
+	//var pixelpoints=[]
+	var lnglatpointsl=[]//左上角
+	var lnglatpointsr=[]//右下角
+	var nowmap=map;
+	
+	/*
+	var moveend = map.on('moveend', function(e) {
+	//if(){
+	//alert('ddd');
+	var l=map.containTolnglat(new AMap.Pixel(450, 150));
+	var r=map.containTolnglat(new AMap.Pixel(962, 662));
+	lnglatpointsl.push([l.getLng(),l.getLat()]);
+	lnglatpointsr.push([r.getLng(),r.getLat()]);
+	  // }
+	   }
+	)
+		var moveend = normalMaptu1.on('moveend', function(e) {
+	//if(){
+	//alert('ddd');
+	var l=normalMaptu1.containTolnglat(new AMap.Pixel(450, 150));
+	var r=normalMaptu1.containTolnglat(new AMap.Pixel(962, 662));
+	lnglatpointsl.push([l.getLng(),l.getLat()]);
+	lnglatpointsr.push([r.getLng(),r.getLat()]);
+	  // }
+	   }
+	)
+			var moveend = normalMaptu2.on('moveend', function(e) {
+	//if(){
+	//alert('ddd');
+	var l=normalMaptu2.containTolnglat(new AMap.Pixel(450, 150));
+	var r=normalMaptu2.containTolnglat(new AMap.Pixel(962, 662));
+	lnglatpointsl.push([l.getLng(),l.getLat()]);
+	lnglatpointsr.push([r.getLng(),r.getLat()]);
+	  // }
+	   }
+	)
+	*/
+	function addLngLat() {
+	
+	//var moveend = nowmap.on('moveend', function(e) {
+	//if(){
+	//alert('ddd');
+	var l=nowmap.containTolnglat(new AMap.Pixel(450, 80));
+	var l1=nowmap.containTolnglat(new AMap.Pixel(962, 80));
+	var r=nowmap.containTolnglat(new AMap.Pixel(450, 592));
+	var r1=nowmap.containTolnglat(new AMap.Pixel(962, 592));
+	<!-- var markerzb= new AMap.Marker({ //添加自定义点标记 -->
+        <!-- map: map, -->
+        <!-- position:[l.getLng(),l.getLat()] , //基点位置 -->
+        <!-- draggable: false //是否可拖动  -->
+
+<!-- });  -->
+<!-- var markerzb= new AMap.Marker({ //添加自定义点标记 -->
+        <!-- map: map, -->
+        <!-- position:[r.getLng(),r.getLat()] , //基点位置 -->
+        <!-- draggable: false //是否可拖动  -->
+        
+<!-- });  -->
+	lnglatpointsl.push([l.getLng(),l.getLat()]);
+	lnglatpointsl.push([l1.getLng(),l1.getLat()]);
+	lnglatpointsl.push([r.getLng(),r.getLat()]);
+	lnglatpointsl.push([r1.getLng(),r1.getLat()]);
+	  // }
+	   }
+	//)
+	//}
+	var minll;var maxll;
+	  function maxmin()
+	  {
+	  var xAsc =Array.from(lnglatpointsl.sort(function(a, b) {
+      return a[0] - b[0]
+  }));
+  //y轴升序
+  var yAsc = lnglatpointsl.sort(function(a, b) {
+    return a[1] - b[1]
+	});
+	  minll = [xAsc[0][0], yAsc[yAsc.length - 1][1]]    
+  //右下角像素坐标
+   maxll = [xAsc[xAsc.length - 1][0], yAsc[0][1]]
+	}
+	
+	
+	
+	
+	
+	
+	
+
+
+//下半部分---------------------------------------------------------------------------------		
+//全屏
+
+
+
+   //实时路况
+   $("#setmap").prepend("<input type='button' class='bottombutton' value='显示路况' id='traffic'/>");
+   var trafficLayer = new AMap.TileLayer.Traffic({
+        zIndex: 10,
+		visible: false
+    });
+	trafficLayer.setMap(map);
+    AMap.event.addDomListener($('#traffic').get(0), 'click', function() {
+		if($("#traffic").val() == "显示路况"){
+	       $("#traffic").val("隐藏路况");
+            trafficLayer.show();
+		}else{
+		   $("#traffic").val("显示路况");
+           trafficLayer.hide();
+		}
+    }, false);
+
+    
+    //常规图
+  $("#setmap").prepend("<input type='button' class='bottombutton' value='常规图' id='normalMap'/>");
+	
+	
+    AMap.event.addDomListener($('#normalMap').get(0), 'click', function() {
+		if($("#normalMap").val() == "常规图"){
+	       $("#normalMap").val("卫星图");
+		   //$('#roadnet').show();
+		   var normalMaptu1=new AMap.Map('mapcontainer',{map: map,features : ['bg','building'], mapStyle: '4284a4e38163df4761dbcebcc7264c1d',zIndex: 1,visible: false,labelzIndex:2,zoom:15});
+		   mouseTool= new AMap.MouseTool(normalMaptu1);
+		   window.map = normalMaptu1;
+		   nowmap=normalMaptu1;
+		}else{
+		   $("#normalMap").val("常规图");
+		      var map = new AMap.Map('mapcontainer', {
+        resizeEnable: true,
+        zoom:11,
+		features : ['bg', 'point'],
+		 layers: [new AMap.TileLayer.Satellite()],
+		 zoom:15,
+		labelzIndex:1
+    });
+	window.map = map;
+		}
+    }, false);
+
+    //路网
+	$("#setmap").prepend("<input type='button' class='bottombutton' value='显示路网' id='roadnet' />");
+	var roadnet=new AMap.TileLayer.RoadNet({map: map, zIndex: 2,visible: false});
+    AMap.event.addDomListener($('#roadnet').get(0), 'click', function() {
+	if($("#normalMap").val() == "常规图"){
+		if($("#roadnet").val() == "显示路网"){
+	       $("#roadnet").val("隐藏路网");
+		   roadnet.show();
+		}else{
+		   $("#roadnet").val("显示路网");
+		   roadnet.hide();
+		}
+		}
+		if($("#normalMap").val() == "卫星图"){
+		if($("#roadnet").val() == "显示路网"){
+	       $("#roadnet").val("隐藏路网");
+		   var normalMaptu2=new AMap.Map('mapcontainer',{map: map,viewMode:'2D',features : ['bg','building','road'], mapStyle: 'amap://styles/2c494b366533dc559951ab6142f76e71',zIndex: 1,visible: false,labelzIndex:2,zoom:15});
+		   mouseTool= new AMap.MouseTool(normalMaptu2);
+		   window.map = normalMaptu2;
+		   nowmap=normalMaptu2
+		}else{
+		   $("#roadnet").val("显示路网");
+		   var normalMaptu3=new AMap.Map('mapcontainer',{map: map,viewMode:'2D',features : ['bg','building'], mapStyle: 'amap://styles/4284a4e38163df4761dbcebcc7264c1d',zIndex: 1,visible: false,labelzIndex:2,zoom:15});
+		   mouseTool= new AMap.MouseTool(normalMaptu3);
+		   window.map = normalMaptu3;
+		}
+		}
+    }, false);
+
+ 
+//------------------------------------------------------------------------------------------------------------
+//其他函数
+//------------------------------------------------------------------------------------------------------------
+
+function addPolydrawLine(list) {
+var mypipe=[];
+     var polydrawLine = new AMap.Polyline({
+        path: list,          //设置线覆盖物路径
+        strokeColor: "#0000CD", //线颜色
+        strokeOpacity: 1,       //线透明度
+        strokeWeight: 5,        //线宽
+        strokeStyle: "solid",   //线样式
+        strokeDasharray: [10, 5], //补充线样式
+		extData:mypipe
+    });
+	mypipe['ID']=ID;
+    polydrawLine.setMap(map);
+}
+
+
+
+$(function () {
+   /*自定义字符串格式化*/
+  String.prototype.Format = function (args) {
+   /*this代表要调用Format方法的字符串*/
+   /*replace的第一个参数为正则表达式，g表示处理匹配到的所有字符串，在js中使用//包起来*/
+   /*replace的第二个参数为匹配字符串的处理，k1匹配结果包含{}，k2只保留{}内的内容*/
+   var temp = this.replace(/\{(\w+)\}/g, function (k1, k2) {
+    console.log(k1, k2);
+    /*replace将匹配到的k2用参数args替换后赋给新变量temp*/
+    return args[k2];
+   });
+   /*自定义方法Format将格式化后的字符串返回*/
+   return temp;
+  };
+ })
+ 
+
+
+
+	 AMap.event.addDomListener($('#zuobiaook').get(0), 'click', function() {
+	  $('#LngLatpool').hide();
+	  });
+	  //坐标转换
+  var x_PI = 3.14159265358979324 * 3000.0 / 180.0;
+  var PI = 3.1415926535897932384626;
+  var a = 6378245.0;
+  var ee = 0.00669342162296594323;
+	var bd09togcj02 = function bd09togcj02(bd_lon, bd_lat) {
+    var bd_lon = +bd_lon;
+    var bd_lat = +bd_lat;
+    var x = bd_lon - 0.0065;
+    var y = bd_lat - 0.006;
+    var z = Math.sqrt(x * x + y * y) - 0.00002 * Math.sin(y * x_PI);
+    var theta = Math.atan2(y, x) - 0.000003 * Math.cos(x * x_PI);
+    var gg_lng = z * Math.cos(theta).toFixed(6);
+    var gg_lat = z * Math.sin(theta).toFixed(6);
+    return [gg_lng, gg_lat]
+  };
+	var gcj02tobd09 = function gcj02tobd09(lng, lat) {
+    var lat = +lat;
+    var lng = +lng;
+    var z = Math.sqrt(lng * lng + lat * lat) + 0.00002 * Math.sin(lat * x_PI);
+    var theta = Math.atan2(lat, lng) + 0.000003 * Math.cos(lng * x_PI);
+    var bd_lng = z * Math.cos(theta) + 0.0065;
+    var bd_lat = z * Math.sin(theta) + 0.006;
+    return [bd_lng.toFixed(6), bd_lat.toFixed(6)]
+  };
+  
+</script>
+<body>
+<script>
+        var Base64 = {
+            // private property
+            _keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
+            // public method for encoding
+            encode: function (input) {
+                var output = "";
+                var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
+                var i = 0;
+                input = Base64._utf8_encode(input);
+                while (i < input.length) {
+                    chr1 = input.charCodeAt(i++);
+                    chr2 = input.charCodeAt(i++);
+                    chr3 = input.charCodeAt(i++);
+                    enc1 = chr1 >> 2;
+                    enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
+                    enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
+                    enc4 = chr3 & 63;
+                    if (isNaN(chr2)) {
+                        enc3 = enc4 = 64;
+                    } else if (isNaN(chr3)) {
+                        enc4 = 64;
+                    }
+                    output = output +
+            this._keyStr.charAt(enc1) + this._keyStr.charAt(enc2) +
+            this._keyStr.charAt(enc3) + this._keyStr.charAt(enc4);
+                }
+                return output;
+            },
+            // public method for decoding
+            decode: function (input) {
+                var output = "";
+                var chr1, chr2, chr3;
+                var enc1, enc2, enc3, enc4;
+                var i = 0;
+                input = input.replace(/[^A-Za-z0-9\+\/\=]/g, "");
+                while (i < input.length) {
+                    enc1 = this._keyStr.indexOf(input.charAt(i++));
+                    enc2 = this._keyStr.indexOf(input.charAt(i++));
+                    enc3 = this._keyStr.indexOf(input.charAt(i++));
+                    enc4 = this._keyStr.indexOf(input.charAt(i++));
+                    chr1 = (enc1 << 2) | (enc2 >> 4);
+                    chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
+                    chr3 = ((enc3 & 3) << 6) | enc4;
+                    output = output + String.fromCharCode(chr1);
+                    if (enc3 != 64) {
+                        output = output + String.fromCharCode(chr2);
+                    }
+                    if (enc4 != 64) {
+                        output = output + String.fromCharCode(chr3);
+                    }
+                }
+                output = Base64._utf8_decode(output);
+                return output;
+            },
+            // private method for UTF-8 encoding
+            _utf8_encode: function (string) {
+                string = string.replace(/\r\n/g, "\n");
+                var utftext = "";
+                for (var n = 0; n < string.length; n++) {
+                    var c = string.charCodeAt(n);
+                    if (c < 128) {
+                        utftext += String.fromCharCode(c);
+                    }
+                    else if ((c > 127) && (c < 2048)) {
+                        utftext += String.fromCharCode((c >> 6) | 192);
+                        utftext += String.fromCharCode((c & 63) | 128);
+                    }
+                    else {
+                        utftext += String.fromCharCode((c >> 12) | 224);
+                        utftext += String.fromCharCode(((c >> 6) & 63) | 128);
+                        utftext += String.fromCharCode((c & 63) | 128);
+                    }
+                }
+                return utftext;
+            },
+            // private method for UTF-8 decoding
+            _utf8_decode: function (utftext) {
+                var string = "";
+                var i = 0;
+                var c = c1 = c2 = 0;
+                while (i < utftext.length) {
+                    c = utftext.charCodeAt(i);
+                    if (c < 128) {
+                        string += String.fromCharCode(c);
+                        i++;
+                    }
+                    else if ((c > 191) && (c < 224)) {
+                        c2 = utftext.charCodeAt(i + 1);
+                        string += String.fromCharCode(((c & 31) << 6) | (c2 & 63));
+                        i += 2;
+                    }
+                    else {
+                        c2 = utftext.charCodeAt(i + 1);
+                        c3 = utftext.charCodeAt(i + 2);
+                        string += String.fromCharCode(((c & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
+                        i += 3;
+                    }
+                }
+                return string;
+            }
+        }
+
+</script>
+
+</body>
+</html>>
